@@ -4,7 +4,8 @@ const ejs = require('ejs');
 const port = 3000;
 var app = express();
 const inshorts = require('inshorts-news-api');
-const fs = require('fs');
+const fs = require('fs')
+var sleep = require('system-sleep');
 
 app.set('view engine', 'ejs');
 app.use(bodyparser.urlencoded({ extended: true }));
@@ -34,60 +35,19 @@ db.connect((err) => {
 
 app.get('/', (req, res) => {
     var trending = new Array();
-    inshorts.getNews(options, function (resul) {
+    inshorts.getNews(options, function (resul, news_offset) {
         for (let i = 0; i < resul.length; i++) {
             trending.push(resul[i]);
         }
-        fs.writeFile('data.json', JSON.stringify(trending), (err, data) => {
-            if (err) {
-                console.log(err);
-            }
-            else {
-                trending = data
-            }
-        })
         // console.log(news_offset); //it will be used in getMorePosts
     });
 
+    sleep(0.5 * 1000)
     db.query('select * from blog_blog where hidden=false order by id desc', (error, results) => {
         if (error) {
             throw error;
         }
         else {
-            try {
-                fs.readFile('data.json', 'utf8', (err, data) => {
-                    if (err) {
-                        console.log(err);
-                    }
-                    else {
-                        trending = data
-                        console.log('got the file')
-                    }
-                })
-                
-            } catch (err) {
-                if (err.code == 'ENOENT') {
-                    console.log('got the error.')
-                    inshorts.getNews(options, function (resul) {
-                        for (let i = 0; i < resul.length; i++) {
-                            trending.push(resul[i]);
-                        }
-                    })
-                    fs.writeFile('data.json', JSON.stringify(trending), (err) => {
-                        if (err)
-                            console.log(err);
-                    })
-                    fs.readFile('data.json', 'utf8', (err, data) => {
-                        if (err) {
-                            console.log(err);
-                        }
-                        else {
-                            trending = data
-                        }
-                    })
-                }
-            }
-
             res.render('base', {
                 all_posts: results.rows,
                 trending: trending,
