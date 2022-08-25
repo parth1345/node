@@ -15,7 +15,8 @@
                                href=""><%= all_posts[i].category %></a>
                             <a class="text-white" href=""><%= all_posts[i].posted_on %></a>
                         </div>
-                        <a class="h2 m-0 text-white text-uppercase font-weight-bold" href=""><%= all_posts[i].title %></a>
+                        <a class="h2 m-0 text-white text-uppercase font-weight-bold"
+                           href="/blogpost/<%= all_posts[i].slug %>"><%= all_posts[i].title %></a>
                     </div>
                 </div>
                 <% } %>
@@ -39,7 +40,7 @@
                     <div class="col-lg-6">
                         <div class="position-relative mb-3">
                             <img class="w-100"
-                                 src="/media/<%= all_posts[i].img_file %>" 
+                                 src="/media/<%= all_posts[i].img_file %>"
                                  height="243"
                                  style="object-fit: cover;">
                             <div class="bg-white border border-top-0 p-4">
@@ -74,20 +75,22 @@
                         <h4 class="m-0 text-uppercase font-weight-bold">Trending News</h4>
                     </div>
                     <div class="bg-white border border-top-0 p-3">
-                        {% for post in trending %}
+                        <!-- {% for post in trending %} -->
+                        <% for(var i=0;i<trending.length;i++){ %>
                             <div class="d-flex align-items-center bg-white mb-3"
                                  style="height: 110px;">
                                 <div class="w-100 h-100 px-3 d-flex flex-column justify-content-center border border-left-0">
                                     <div class="mb-2">
                                         <a class="badge badge-primary text-uppercase font-weight-semi-bold p-1 mr-2">Trending</a>
-                                        <a class="text-body"><small>{{ post.date }}</small></a>
+                                        <a class="text-body"><small><%= trending[i].date %></small></a>
                                     </div>
                                     <a class="h6 m-0 text-secondary text-uppercase font-weight-bold"
-                                       href="{{ post.readMoreUrl }}"
-                                       target="_blank">{{ post.title }}</a>
+                                       href="<%= trending[i].readMore %>"
+                                       target="_blank"><%= trending[i].title %></a>
                                 </div>
                             </div>
-                        {% endfor %}
+                            <% } %>
+                        <!-- {% endfor %} -->
                     </div>
                 </div>
                 <!-- Popular News End -->

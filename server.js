@@ -3,11 +3,18 @@ const bodyparser = require('body-parser');
 const ejs = require('ejs');
 const port = 3000;
 var app = express();
+const inshorts = require('inshorts-news-api');
+const fs = require('fs');
 
 app.set('view engine', 'ejs');
 app.use(bodyparser.urlencoded({ extended: true }));
 app.use('/static', express.static(__dirname + '/public'));
 app.use('/media', express.static(__dirname + '/media'));
+
+var options = {
+    lang: 'en',
+    category: 'sports'
+}
 
 // database
 const Pool = require('pg').Pool;
@@ -26,13 +33,64 @@ db.connect((err) => {
 
 
 app.get('/', (req, res) => {
+    var trending = new Array();
+    inshorts.getNews(options, function (resul) {
+        for (let i = 0; i < resul.length; i++) {
+            trending.push(resul[i]);
+        }
+        fs.writeFile('data.json', JSON.stringify(trending), (err, data) => {
+            if (err) {
+                console.log(err);
+            }
+            else {
+                trending = data
+            }
+        })
+        // console.log(news_offset); //it will be used in getMorePosts
+    });
+
     db.query('select * from blog_blog where hidden=false order by id desc', (error, results) => {
         if (error) {
             throw error;
         }
         else {
+            try {
+                fs.readFile('data.json', 'utf8', (err, data) => {
+                    if (err) {
+                        console.log(err);
+                    }
+                    else {
+                        trending = data
+                        console.log('got the file')
+                    }
+                })
+                
+            } catch (err) {
+                if (err.code == 'ENOENT') {
+                    console.log('got the error.')
+                    inshorts.getNews(options, function (resul) {
+                        for (let i = 0; i < resul.length; i++) {
+                            trending.push(resul[i]);
+                        }
+                    })
+                    fs.writeFile('data.json', JSON.stringify(trending), (err) => {
+                        if (err)
+                            console.log(err);
+                    })
+                    fs.readFile('data.json', 'utf8', (err, data) => {
+                        if (err) {
+                            console.log(err);
+                        }
+                        else {
+                            trending = data
+                        }
+                    })
+                }
+            }
+
             res.render('base', {
-                all_posts: results.rows
+                all_posts: results.rows,
+                trending: trending,
             })
         }
     })
