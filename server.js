@@ -35,25 +35,34 @@ db.connect((err) => {
 
 app.get('/', (req, res) => {
     var trending = new Array();
-    inshorts.getNews(options, function (resul, news_offset) {
-        for (let i = 0; i < resul.length; i++) {
-            trending.push(resul[i]);
-        }
-        // console.log(news_offset); //it will be used in getMorePosts
-    });
+    // inshorts.getNews(options, function (resul, news_offset) {
+    //     for (let i = 0; i < resul.length; i++) {
+    //         trending.push(resul[i]);
+    //     }
+    // });
 
-    sleep(0.5 * 1000)
-    db.query('select * from blog_blog where hidden=false order by id desc', (error, results) => {
-        if (error) {
-            throw error;
-        }
-        else {
-            res.render('base', {
-                all_posts: results.rows,
-                trending: trending,
-            })
-        }
+    // sleep(0.5 * 1000)
+    let promise = new Promise((resolve, reject) => {
+        inshorts.getNews(options, (resul) => {
+            for (let i = 0; i < resul.length; i++) {
+                trending.push(resul[i]);
+            }
+        })
     })
+    promise.then(() => {
+        db.query('select * from blog_blog where hidden=false order by id desc', (error, results) => {
+            if (error) {
+                throw error;
+            }
+            else {
+                res.render('base', {
+                    all_posts: results.rows,
+                    trending: trending,
+                })
+            }
+        })
+    })
+
     // res.render('base')
 });
 
