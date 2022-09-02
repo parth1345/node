@@ -34,7 +34,6 @@ db.connect((err) => {
 
 
 app.get('/', (req, res) => {
-    var trending = new Array();
     // inshorts.getNews(options, function (resul, news_offset) {
     //     for (let i = 0; i < resul.length; i++) {
     //         trending.push(resul[i]);
@@ -43,11 +42,13 @@ app.get('/', (req, res) => {
 
     // sleep(0.5 * 1000)
     let promise = new Promise((resolve, reject) => {
+        var trending = new Array();
         inshorts.getNews(options, (resul) => {
             for (let i = 0; i < resul.length; i++) {
                 trending.push(resul[i]);
             }
         })
+        resolve(trending)
     })
     promise.then(() => {
         db.query('select * from blog_blog where hidden=false order by id desc', (error, results) => {
