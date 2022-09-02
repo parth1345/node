@@ -1,11 +1,8 @@
 const express = require('express');
 const bodyparser = require('body-parser');
-const ejs = require('ejs');
 const port = 3000;
 var app = express();
 const inshorts = require('inshorts-news-api');
-const fs = require('fs')
-var sleep = require('system-sleep');
 
 app.set('view engine', 'ejs');
 app.use(bodyparser.urlencoded({ extended: true }));
@@ -34,26 +31,19 @@ db.connect((err) => {
 
 
 app.get('/', (req, res) => {
-    // inshorts.getNews(options, function (resul, news_offset) {
-    //     for (let i = 0; i < resul.length; i++) {
-    //         trending.push(resul[i]);
-    //     }
-    // });
-
-    // sleep(0.5 * 1000)
+    let trending = new Array();
     let promise = new Promise((resolve, reject) => {
-        var trending = new Array();
         inshorts.getNews(options, (resul) => {
             for (let i = 0; i < resul.length; i++) {
                 trending.push(resul[i]);
             }
+            resolve(trending)
         })
-        resolve(trending)
     })
     promise.then(() => {
-        db.query('select * from blog_blog where hidden=false order by id desc', (error, results) => {
-            if (error) {
-                throw error;
+        db.query('select * from blog_blog where hidden=false order by id desc', (err, results) => {
+            if (err) {
+                throw err;
             }
             else {
                 res.render('base', {
