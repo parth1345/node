@@ -3,6 +3,7 @@ const bodyparser = require('body-parser');
 const port = 3000;
 var app = express();
 const inshorts = require('inshorts-news-api');
+const Sequelize = require('sequelize')
 
 app.set('view engine', 'ejs');
 app.use(bodyparser.urlencoded({ extended: true }));
@@ -15,19 +16,30 @@ var options = {
 }
 
 // database
-const Pool = require('pg').Pool;
-const db = new Pool({
-    user: 'dbadmin',
-    password: '123',
-    host: 'localhost',
-    port: 5432,
-    database: 'iblogger'
-});
-db.connect((err) => {
-    if (err) throw err;
-    console.log("Database connected!");
-});
-// 
+// const Pool = require('pg').Pool;
+// const db = new Pool({
+//     user: 'dbadmin',
+//     password: '123',
+//     host: 'localhost',
+//     port: 5432,
+//     database: 'iblogger'
+// });
+// db.connect((err) => {
+//     if (err) throw err;
+//     console.log("Database connected!");
+// });
+
+
+const connect_db = async function () {
+    const sequelize = new Sequelize('postgres://dbadmin:123@localhost:5432/iblogger');
+    try {
+        await sequelize.authenticate();
+        console.log('connection has been made');
+    } catch (err) {
+        console.log(err);
+    }
+}
+connect_db()
 
 
 app.get('/', (req, res) => {
