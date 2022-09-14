@@ -1,9 +1,15 @@
 const express = require('express');
 const bodyparser = require('body-parser');
+const ejs = require('ejs');
 const port = 3000;
 var app = express();
 const inshorts = require('inshorts-news-api');
+<<<<<<< HEAD
 const Sequelize = require('sequelize')
+=======
+const fs = require('fs')
+var sleep = require('system-sleep');
+>>>>>>> parent of 9b96c91 (promise working on home page trending data)
 
 app.set('view engine', 'ejs');
 app.use(bodyparser.urlencoded({ extended: true }));
@@ -43,19 +49,26 @@ connect_db()
 
 
 app.get('/', (req, res) => {
-    let trending = new Array();
+    // inshorts.getNews(options, function (resul, news_offset) {
+    //     for (let i = 0; i < resul.length; i++) {
+    //         trending.push(resul[i]);
+    //     }
+    // });
+
+    // sleep(0.5 * 1000)
     let promise = new Promise((resolve, reject) => {
+        var trending = new Array();
         inshorts.getNews(options, (resul) => {
             for (let i = 0; i < resul.length; i++) {
                 trending.push(resul[i]);
             }
-            resolve(trending)
         })
+        resolve(trending)
     })
     promise.then(() => {
-        db.query('select * from blog_blog where hidden=false order by id desc', (err, results) => {
-            if (err) {
-                throw err;
+        db.query('select * from blog_blog where hidden=false order by id desc', (error, results) => {
+            if (error) {
+                throw error;
             }
             else {
                 res.render('base', {

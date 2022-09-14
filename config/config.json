@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "dbadmin",
+    "password": "123",
+    "database": "iblogger_node",
+    "host": "localhost",
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "dbadmin",
+    "password": "123",
+    "database": "iblogger_node",
+    "host": "localhost",
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "dbadmin",
+    "password": "123",
+    "database": "iblogger_node",
+    "host": "localhost",
+    "dialect": "postgres"
+  }
+}
