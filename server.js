@@ -1,15 +1,9 @@
 const express = require('express');
 const bodyparser = require('body-parser');
-const ejs = require('ejs');
 const port = 3000;
 var app = express();
 const inshorts = require('inshorts-news-api');
-<<<<<<< HEAD
-const Sequelize = require('sequelize')
-=======
-const fs = require('fs')
-var sleep = require('system-sleep');
->>>>>>> parent of 9b96c91 (promise working on home page trending data)
+require('./db')
 
 app.set('view engine', 'ejs');
 app.use(bodyparser.urlencoded({ extended: true }));
@@ -34,18 +28,6 @@ var options = {
 //     if (err) throw err;
 //     console.log("Database connected!");
 // });
-
-
-const connect_db = async function () {
-    const sequelize = new Sequelize('postgres://dbadmin:123@localhost:5432/iblogger');
-    try {
-        await sequelize.authenticate();
-        console.log('connection has been made');
-    } catch (err) {
-        console.log(err);
-    }
-}
-connect_db()
 
 
 app.get('/', (req, res) => {
@@ -104,8 +86,7 @@ app.get('/addpost', (req, res) => {
 });
 
 app.post('/addpost', (req, res) => {
-    var title = req.body.title;
-    res.redirect('/');
+    res.redirect('/addpost');
 });
 
 app.listen(port, () => {
