@@ -4,12 +4,6 @@ const sequelize = new Sequelize('iblogger_node', 'dbadmin', '123', {
     host: 'localhost',
     dialect: 'postgres',
     port: 5432,
-
-    // pool: {
-    //     max: 5,
-    //     min: 0,
-    //     idle: 10000
-    // }
 });
 sequelize.authenticate()
     .then(() => {
@@ -19,16 +13,8 @@ sequelize.authenticate()
         console.log(err);
     })
 
-var db = {};
-
+module.exports = db = {};
 db.sequelize = sequelize;
-db.Sequelize = Sequelize;
-
-db.sequelize.sync({
-    force: true
-})
-    .then(() => {
-        console.log("database has been synced")
-    })
-
-module.exports = db;
+//import models here which needs to be created in db.
+db.Employee = require("./models/user")
+sequelize.sync()

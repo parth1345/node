@@ -1,10 +1,50 @@
-var db = require('../db'),
-    sequelize = db.sequelize,
-    Sequelize = db.Sequelize;
+const { Sequelize, DataTypes } = require("sequelize");
 
-var User = sequelize.define('random', {
-    first_name: Sequelize.STRING,
-    last_name: Sequelize.STRING
+const db = require('../db');
+
+
+const sequelize = db.sequelize;
+
+const Employee = sequelize.define("Employee", {
+
+    id: {
+
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        allowNull: false,
+        primaryKey: true,
+
+    },
+
+    name: {
+
+        type: DataTypes.STRING,
+        allowNull: false,
+
+    },
+    position: {
+
+        type: DataTypes.STRING,
+        allowNull: false,
+
+    },
+
+    email: {
+
+        type: DataTypes.STRING,
+        allowNull: false,
+
+    },
+    wage: {
+
+        type: DataTypes.INTEGER,
+        allowNull: false,
+
+    },
+
 });
 
-module.exports = User;
+
+
+
+module.exports = Employee;
