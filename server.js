@@ -6,7 +6,9 @@ const inshorts = require('inshorts-news-api');
 require('./db')
 
 app.set('view engine', 'ejs');
-app.use(bodyparser.urlencoded({ extended: true }));
+app.use(bodyparser.urlencoded({
+    extended: true
+}));
 app.use('/static', express.static(__dirname + '/public'));
 app.use('/media', express.static(__dirname + '/media'));
 
@@ -31,13 +33,6 @@ var options = {
 
 
 app.get('/', (req, res) => {
-    // inshorts.getNews(options, function (resul, news_offset) {
-    //     for (let i = 0; i < resul.length; i++) {
-    //         trending.push(resul[i]);
-    //     }
-    // });
-
-    // sleep(0.5 * 1000)
     let promise = new Promise((resolve, reject) => {
         var trending = new Array();
         inshorts.getNews(options, (resul) => {
@@ -51,8 +46,7 @@ app.get('/', (req, res) => {
         db.query('select * from blog_blog where hidden=false order by id desc', (error, results) => {
             if (error) {
                 throw error;
-            }
-            else {
+            } else {
                 res.render('base', {
                     all_posts: results.rows,
                     trending: trending,
@@ -60,8 +54,6 @@ app.get('/', (req, res) => {
             }
         })
     })
-
-    // res.render('base')
 });
 
 app.get('/blogpost/:slug', (req, res) => {
@@ -70,8 +62,7 @@ app.get('/blogpost/:slug', (req, res) => {
     db.query(query, (error, results) => {
         if (error) {
             throw error;
-        }
-        else {
+        } else {
             var post = results.rows[0]
             res.render('blogpost', {
                 post: post
