@@ -4,6 +4,21 @@ const port = 3000;
 var app = express();
 const inshorts = require('inshorts-news-api');
 require('./db')
+const { insert_blog, get_allblogs, get_trending } = require('./controllers/blog_controller');
+
+// database
+const Pool = require('pg').Pool;
+const db = new Pool({
+    user: 'dbadmin',
+    password: '123',
+    host: 'localhost',
+    port: 5432,
+    database: 'iblogger'
+});
+db.connect((err) => {
+    if (err) throw err;
+    console.log("Database connected!");
+});
 
 app.set('view engine', 'ejs');
 app.use(bodyparser.urlencoded({
@@ -17,44 +32,15 @@ var options = {
     category: 'sports'
 }
 
-// database
-// const Pool = require('pg').Pool;
-// const db = new Pool({
-//     user: 'dbadmin',
-//     password: '123',
-//     host: 'localhost',
-//     port: 5432,
-//     database: 'iblogger'
-// });
-// db.connect((err) => {
-//     if (err) throw err;
-//     console.log("Database connected!");
-// });
-
-
-app.get('/', (req, res) => {
-    let promise = new Promise((resolve, reject) => {
-        var trending = new Array();
-        inshorts.getNews(options, (resul) => {
-            for (let i = 0; i < resul.length; i++) {
-                trending.push(resul[i]);
-            }
-        })
-        resolve(trending)
-    })
-    promise.then(() => {
-        db.query('select * from blog_blog where hidden=false order by id desc', (error, results) => {
-            if (error) {
-                throw error;
-            } else {
-                res.render('base', {
-                    all_posts: results.rows,
-                    trending: trending,
-                })
-            }
-        })
+app.get('/', async (req, res) => {
+    var blogs = await get_allblogs();
+    var trending = await get_trending();
+    res.render('base', {
+        all_posts: blogs.rows,
+        trending: trending
     })
 });
+
 
 app.get('/blogpost/:slug', (req, res) => {
     var slug = req.params.slug;
@@ -76,8 +62,19 @@ app.get('/addpost', (req, res) => {
     res.render('addpost');
 });
 
-app.post('/addpost', (req, res) => {
-    res.redirect('/addpost');
+app.post('/addpost', async (req, res) => {
+    var title = req.body.title;
+    var slug = 'new-title';
+    var author = 'parthshah';
+    var content = req.body.content;
+    const blog = await insert_blog(title, slug, author, content)
+        .then(() => {
+            console.log('blog has been addes')
+            res.redirect('/addpost');
+        })
+        .catch((err) => {
+            console.log(err)
+        })
 });
 
 app.listen(port, () => {
